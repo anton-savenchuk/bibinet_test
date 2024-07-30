@@ -5,65 +5,161 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Mark',
+            name="Mark",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='Марка автомобиля')),
-                ('producer_country_name', models.CharField(max_length=255, verbose_name='Страна производителя')),
-                ('is_visible', models.BooleanField(default=True, verbose_name='Показывать')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        max_length=255, verbose_name="Марка автомобиля"
+                    ),
+                ),
+                (
+                    "producer_country_name",
+                    models.CharField(
+                        max_length=255, verbose_name="Страна производителя"
+                    ),
+                ),
+                (
+                    "is_visible",
+                    models.BooleanField(
+                        default=True, verbose_name="Показывать"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Марка автомобиля',
-                'verbose_name_plural': 'Марки автомобилей',
-                'ordering': ['name'],
-                'indexes': [models.Index(fields=['name', 'producer_country_name', 'is_visible'], name='parts_mark_name_69a154_idx')],
+                "verbose_name": "Марка автомобиля",
+                "verbose_name_plural": "Марки автомобилей",
+                "ordering": ["name"],
+                "indexes": [
+                    models.Index(
+                        fields=["name", "producer_country_name", "is_visible"],
+                        name="parts_mark_name_69a154_idx",
+                    )
+                ],
             },
         ),
         migrations.CreateModel(
-            name='Model',
+            name="Model",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='Модель автомобиля')),
-                ('is_visible', models.BooleanField(default=True, verbose_name='Показывать')),
-                ('mark', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='parts.mark', verbose_name='Марка автомобиля')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        max_length=255, verbose_name="Модель автомобиля"
+                    ),
+                ),
+                (
+                    "is_visible",
+                    models.BooleanField(
+                        default=True, verbose_name="Показывать"
+                    ),
+                ),
+                (
+                    "mark",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="parts.mark",
+                        verbose_name="Марка автомобиля",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Модель автомобиля',
-                'verbose_name_plural': 'Модели автомобилей',
-                'ordering': ['name'],
+                "verbose_name": "Модель автомобиля",
+                "verbose_name_plural": "Модели автомобилей",
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='Part',
+            name="Part",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='Название запчасти')),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='Стоимость запчасти')),
-                ('json_data', models.JSONField(blank=True, default=dict)),
-                ('is_visible', models.BooleanField(default=True, verbose_name='Показывать')),
-                ('mark', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='parts.mark', verbose_name='Марка автомобиля')),
-                ('model', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='parts.model', verbose_name='Модель автомобиля')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        max_length=255, verbose_name="Название запчасти"
+                    ),
+                ),
+                (
+                    "price",
+                    models.DecimalField(
+                        decimal_places=2,
+                        max_digits=10,
+                        verbose_name="Стоимость запчасти",
+                    ),
+                ),
+                ("json_data", models.JSONField(blank=True, default=dict)),
+                (
+                    "is_visible",
+                    models.BooleanField(
+                        default=True, verbose_name="Показывать"
+                    ),
+                ),
+                (
+                    "mark",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="parts.mark",
+                        verbose_name="Марка автомобиля",
+                    ),
+                ),
+                (
+                    "model",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="parts.model",
+                        verbose_name="Модель автомобиля",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Запчасть',
-                'verbose_name_plural': 'Запчасти',
-                'ordering': ['name', 'mark', 'model', 'price'],
+                "verbose_name": "Запчасть",
+                "verbose_name_plural": "Запчасти",
+                "ordering": ["name", "mark", "model", "price"],
             },
         ),
         migrations.AddIndex(
-            model_name='model',
-            index=models.Index(fields=['name', 'mark', 'is_visible'], name='parts_model_name_aa9083_idx'),
+            model_name="model",
+            index=models.Index(
+                fields=["name", "mark", "is_visible"],
+                name="parts_model_name_aa9083_idx",
+            ),
         ),
         migrations.AddIndex(
-            model_name='part',
-            index=models.Index(fields=['name', 'mark', 'model', 'price', 'is_visible'], name='parts_part_name_dfe028_idx'),
+            model_name="part",
+            index=models.Index(
+                fields=["name", "mark", "model", "price", "is_visible"],
+                name="parts_part_name_dfe028_idx",
+            ),
         ),
     ]
