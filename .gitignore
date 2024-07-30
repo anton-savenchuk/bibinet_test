@@ -1,0 +1,39 @@
+# Editor directories
+.vscode/
+.history
+.idea/
+
+# Django
+*.pot
+*.pyc
+media/
+
+# DB
+db.sqlite3
+
+# Cache
+.ruff*
+__pycache__/
+django_cache
+
+# Logs
+logs/
+*.log
+
+# Backup files
+*.bak
+
+# Docker
+docker/nginx/prod
+
+# Environments
+.env/
+.venv/
+.env.*
+.venv.*
+!.env.dev.example
+
+# Others
+.DS_Store
+certbot/
+tests/
