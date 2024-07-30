@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Mark, Model, Part
+
+
+admin.site.register(Mark)
+admin.site.register(Model)
+admin.site.register(Part)
