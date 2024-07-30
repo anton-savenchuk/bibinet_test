@@ -19,7 +19,7 @@ class Mark(models.Model):
 
         verbose_name = "Марка автомобиля"
         verbose_name_plural = "Марки автомобилей"
-        ordering = ["name"]
+        ordering = ["id", "name"]
         indexes = [
             models.Index(fields=["name", "producer_country_name", "is_visible"])
         ]
@@ -43,12 +43,12 @@ class Model(models.Model):
 
         verbose_name = "Модель автомобиля"
         verbose_name_plural = "Модели автомобилей"
-        ordering = ["name"]
+        ordering = ["id", "name", "mark"]
         indexes = [models.Index(fields=["name", "mark", "is_visible"])]
 
 
 class Part(models.Model):
-    """Модель запчасти."""
+    """Модель запчасти автомобиля."""
 
     name = models.CharField(max_length=255, verbose_name="Название запчасти")
     mark = models.ForeignKey(
@@ -72,7 +72,7 @@ class Part(models.Model):
 
         verbose_name = "Запчасть"
         verbose_name_plural = "Запчасти"
-        ordering = ["name", "mark", "model", "price"]
+        ordering = ["id", "name", "mark", "model", "price"]
         indexes = [
             models.Index(
                 fields=["name", "mark", "model", "price", "is_visible"]
