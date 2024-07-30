@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}BIBINET - {{ title }}{% endblock%}
+
+{% block content %}
+<h1 class="mt-5">{{ title }}</h1>
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Марка автомобиля</th>
+            <th scope="col">Страна производителя</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for mark in marks %}
+        <tr>
+            <td>{{ mark.name }}</td>
+            <td>{{ mark.producer_country_name }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
