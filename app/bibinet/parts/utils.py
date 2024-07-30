@@ -3,6 +3,7 @@ from core.settings import PAGINATION_RANGE
 
 menu = [
     {"title": "Марки автомобилей", "url_name": "marks"},
+    {"title": "Модели автомобилей", "url_name": "models"},
 ]
 
 
