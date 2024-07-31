@@ -2,6 +2,7 @@ import json
 
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, View
@@ -97,3 +98,43 @@ class PartSearchJsonView(View):
         }
 
         return JsonResponse(response_data)
+
+
+class PartSearchView(DataMixin, ListView):
+    model = Part
+    template_name = "parts/search_part.html"
+    context_object_name = "parts"
+
+    def get_context_data(self, **kwargs):
+        """Вернуть словарь для использования в качестве контекста шаблона."""
+        context = super().get_context_data(**kwargs)
+        context["search_data"] = self.request.GET
+        user_context = self.get_user_context(title="Поиск запчастей")
+
+        return context | user_context
+
+    def get_queryset(self):
+        """Вернуть список элементов для этого представления."""
+        queryset = Part.objects.filter(is_visible=True)
+        mark_name = self.request.GET.get("mark_name")
+        part_name = self.request.GET.get("part_name")
+        color = self.request.GET.get("color")
+        is_new_part = self.request.GET.get("is_new_part")
+        price_gte = self.request.GET.get("price_gte")
+        price_lte = self.request.GET.get("price_lte")
+
+        if mark_name:
+            queryset = queryset.filter(mark__name__icontains=mark_name)
+        if part_name:
+            queryset = queryset.filter(name__icontains=part_name)
+        if color:
+            queryset = queryset.filter(json_data__color__icontains=color)
+        if is_new_part:
+            is_new_part_bool = True if is_new_part.lower() == "true" else False
+            queryset = queryset.filter(json_data__is_new_part=is_new_part_bool)
+        if price_gte:
+            queryset = queryset.filter(price__gte=price_gte)
+        if price_lte:
+            queryset = queryset.filter(price__lte=price_lte)
+
+        return queryset
