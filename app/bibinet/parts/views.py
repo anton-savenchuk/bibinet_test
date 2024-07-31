@@ -1,11 +1,9 @@
 import json
 
-from django.core.paginator import Paginator
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView, View
+from django.views.generic import ListView
 
 from .models import Mark, Model, Part
 from .utils import DataMixin
@@ -50,54 +48,74 @@ class ModelListView(DataMixin, ListView):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class PartSearchJsonView(View):
-    def post(self, request):
-        data = json.loads(request.body)
-        parts = Part.objects.filter(is_visible=True)
+class PartSearchJsonView(DataMixin, ListView):
+    model = Part
+    paginate_by = 10
 
-        if "mark_name" in data:
-            parts = parts.filter(mark__name__icontains=data["mark_name"])
-        if "part_name" in data:
-            parts = parts.filter(name__icontains=(data["part_name"]))
-        if "params" in data:
-            params = data["params"]
-            if "color" in params:
-                parts = parts.filter(json_data__color=params["color"])
-            if "is_new_part" in params:
-                is_new_part = True if params["is_new_part"] == "true" else False
-                parts = parts.filter(json_data__is_new_part=is_new_part)
-        if "price_gte" in data:
-            parts = parts.filter(price__gte=data["price_gte"])
-        if "price_lte" in data:
-            parts = parts.filter(price__lte=data["price_lte"])
+    def post(self, request, *args, **kwargs):
+        """Вернуть обработанный POST-запрос."""
+        self.data = json.loads(request.body)
+        self.page_number = self.data.get("page", 1)
+        return self.get(request, *args, **kwargs)
 
-        json_paginator = Paginator(parts, 10)
-        page_number = data.get("page", 1)
-        page_obj = json_paginator.get_page(page_number)
-
-        results = []
-        for part in page_obj:
-            results.append(
-                {
-                    "mark": {
-                        "id": part.mark.id,
-                        "name": part.mark.name,
-                        "producer_country_name": part.mark.producer_country_name,
-                    },
-                    "model": {"id": part.model.id, "name": part.model.name},
-                    "name": part.name,
-                    "json_data": part.json_data,
-                    "price": part.price,
-                }
-            )
+    def get_context_data(self, **kwargs):
+        """Вернуть словарь для использования в качестве контекста шаблона."""
+        context = super().get_context_data(**kwargs)
+        user_context = self.get_user_context(title="Поиск запчастей")
+        context |= user_context
+        results = [
+            {
+                "mark": {
+                    "id": part.mark.id,
+                    "name": part.mark.name,
+                    "producer_country_name": part.mark.producer_country_name,
+                },
+                "model": {"id": part.model.id, "name": part.model.name},
+                "name": part.name,
+                "json_data": part.json_data,
+                "price": part.price,
+            }
+            for part in context["page_obj"]
+        ]
 
         response_data = {
             "response": results,
-            "count": parts.count(),
-            "summ": sum(part.price for part in parts),
+            "count": context["paginator"].count,
+            "summ": sum(
+                part.price for part in context["paginator"].object_list
+            ),
         }
 
-        return JsonResponse(response_data)
+        return response_data
+
+    def get_queryset(self):
+        """Вернуть список элементов для этого представления с учетом
+        фильтров из данных запроса."""
+        queryset = Part.objects.filter(is_visible=True)
+
+        if "mark_name" in self.data:
+            queryset = queryset.filter(
+                mark__name__icontains=self.data["mark_name"]
+            )
+        if "part_name" in self.data:
+            queryset = queryset.filter(name__icontains=self.data["part_name"])
+        if "params" in self.data:
+            params = self.data["params"]
+            if "color" in params:
+                queryset = queryset.filter(json_data__color=params["color"])
+            if "is_new_part" in params:
+                is_new_part = params["is_new_part"]
+                queryset = queryset.filter(json_data__is_new_part=is_new_part)
+        if "price_gte" in self.data:
+            queryset = queryset.filter(price__gte=self.data["price_gte"])
+        if "price_lte" in self.data:
+            queryset = queryset.filter(price__lte=self.data["price_lte"])
+
+        return queryset
+
+    def render_to_response(self, context, **response_kwargs):
+        """Вернуть данные в формате JSON."""
+        return JsonResponse(self.get_context_data())
 
 
 class PartSearchView(DataMixin, ListView):
@@ -114,7 +132,8 @@ class PartSearchView(DataMixin, ListView):
         return context | user_context
 
     def get_queryset(self):
-        """Вернуть список элементов для этого представления."""
+        """Вернуть список элементов для этого представления с учетом
+        фильтров из данных запроса."""
         queryset = Part.objects.filter(is_visible=True)
         mark_name = self.request.GET.get("mark_name")
         part_name = self.request.GET.get("part_name")
