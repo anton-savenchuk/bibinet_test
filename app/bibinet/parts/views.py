@@ -44,7 +44,7 @@ class ModelListView(DataMixin, ListView):
 
     def get_queryset(self):
         """Вернуть список элементов для этого представления."""
-        return Model.objects.filter(is_visible=True)
+        return Model.objects.filter(is_visible=True).select_related("mark")
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -91,7 +91,9 @@ class PartSearchJsonView(DataMixin, ListView):
     def get_queryset(self):
         """Вернуть список элементов для этого представления с учетом
         фильтров из данных запроса."""
-        queryset = Part.objects.filter(is_visible=True)
+        queryset = Part.objects.filter(is_visible=True).select_related(
+            "mark", "model"
+        )
 
         if "mark_name" in self.data:
             queryset = queryset.filter(
@@ -134,7 +136,9 @@ class PartSearchView(DataMixin, ListView):
     def get_queryset(self):
         """Вернуть список элементов для этого представления с учетом
         фильтров из данных запроса."""
-        queryset = Part.objects.filter(is_visible=True)
+        queryset = Part.objects.filter(is_visible=True).select_related(
+            "mark", "model"
+        )
         mark_name = self.request.GET.get("mark_name")
         part_name = self.request.GET.get("part_name")
         color = self.request.GET.get("color")
