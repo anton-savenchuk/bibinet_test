@@ -1,0 +1,60 @@
+version: '3.8'
+
+volumes:
+  postgres_data:
+  static_data:
+  media_data:
+
+networks:
+  bibinet_net:
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bibinet_django
+    restart: always
+    ports:
+      - '8000:8000'
+    networks:
+      - bibinet_net
+    env_file:
+      - ./app/bibinet/env/.env.dev
+    volumes:
+      - static_data:/opt/bibinet/static
+      - media_data:/opt/bibinet/media
+    depends_on:
+      - postgres
+    command: sh -c 'poetry run python manage.py collectstatic --no-input &&
+                    poetry run python manage.py makemigrations &&
+                    poetry run python manage.py migrate &&
+                    poetry run gunicorn core.wsgi:application --bind 0.0.0.0:8000'
+
+  postgres:
+    image: postgres:alpine
+    container_name: bibinet_postgres
+    restart: always
+    env_file:
+      - ./app/bibinet/env/.env.dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - bibinet_net
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: bibinet_nginx
+    restart: always
+    ports:
+      - '80:80'
+    networks:
+      - bibinet_net
+    volumes:
+      - ./app/bibinet/static:/opt/bibinet/static
+      - ./app/bibinet/media:/opt/bibinet/media
+      - ./nginx/dev/:/etc/nginx/conf.d:ro
+    links:
+      - django
+    depends_on:
+      - django

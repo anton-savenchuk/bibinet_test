@@ -50,7 +50,6 @@ class ModelListView(DataMixin, ListView):
 @method_decorator(csrf_exempt, name="dispatch")
 class PartSearchJsonView(DataMixin, ListView):
     model = Part
-    paginate_by = 10
 
     def post(self, request, *args, **kwargs):
         """Вернуть обработанный POST-запрос."""
@@ -73,7 +72,7 @@ class PartSearchJsonView(DataMixin, ListView):
                 "model": {"id": part.model.id, "name": part.model.name},
                 "name": part.name,
                 "json_data": part.json_data,
-                "price": part.price,
+                "price": float(part.price),
             }
             for part in context["page_obj"]
         ]
@@ -81,8 +80,8 @@ class PartSearchJsonView(DataMixin, ListView):
         response_data = {
             "response": results,
             "count": context["paginator"].count,
-            "summ": sum(
-                part.price for part in context["paginator"].object_list
+            "summ": float(
+                sum(part.price for part in context["paginator"].object_list)
             ),
         }
 

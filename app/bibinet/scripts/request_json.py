@@ -30,7 +30,7 @@ response = requests.post(url, headers=headers, data=json.dumps(data))
 if response.status_code == 200:
     print(
         json.dumps(
-            response.json(), ensure_ascii=False, indent=4, sort_keys=True
+            response.json(), ensure_ascii=False, indent=4
         )
     )
 else:
