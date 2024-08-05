@@ -5,7 +5,7 @@
 ~ cd bibinet_test
 ```
 
-В папке приложения `app/bibinet/env` измените файл `.env.dev.example`, указав свои переменные окружения, и переименуйте его в `.env.dev`
+В папке приложения `app/env` измените файл `.env.dev.example`, указав свои переменные окружения, и переименуйте его в `.env.dev`
 
 ## Сборка и запуск docker-compose
 
@@ -36,6 +36,17 @@
 ## POST запрос
 
 Для поиска запчастей в **JSON** формате мажно вольпользоваться скриптом `scripts/request_json.py`
+
+```bash
+~ docker exec -it bibinet_django bash
+~ poetry run python scripts/request_json.py
+```
+
+Либо самостоятельным скриптом используя следующие адреса:
+
+Url для Django: `http://localhost:8000/api/search/part/`
+
+Url для FastAPI: `http://localhost:9000/api/search/part/`
 
 Пример запроса:
 

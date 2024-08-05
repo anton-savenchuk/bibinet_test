@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load markdown_extras %}
+{% block title %}BIBINET Parts - {{ title }}{% endblock%}
+
+{% block content %}
+<h1 class="mt-5">{{ title }}</h1>
+
+<div class="description">
+    {{ description|markdown }}
+</div>
+{% endblock %}

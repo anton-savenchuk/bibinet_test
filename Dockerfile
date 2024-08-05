@@ -36,7 +36,9 @@ ENV PATH=$POETRY_HOME/bin:$PATH
 # Import our project files
 WORKDIR $PROJECT_PATH
 COPY ./poetry.lock ./pyproject.toml ./
-COPY ./app/bibinet ./
+COPY ./app/bibinet_django ./
+# COPY ./app/scripts ./scripts
+COPY ./app/__init__.py ./
 
 # Install project
 RUN poetry install --without dev && rm -rf $POETRY_CACHE_DIR

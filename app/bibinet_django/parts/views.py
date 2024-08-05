@@ -1,12 +1,14 @@
 import json
 
+import requests
 from django.http import JsonResponse
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 
 from .models import Mark, Model, Part
-from .utils import DataMixin
+from .utils import DataMixin, menu
 
 
 class MarkListView(DataMixin, ListView):
@@ -64,6 +66,7 @@ class PartSearchJsonView(DataMixin, ListView):
         context |= user_context
         results = [
             {
+                "id": part.id,
                 "mark": {
                     "id": part.mark.id,
                     "name": part.mark.name,
@@ -160,3 +163,17 @@ class PartSearchView(DataMixin, ListView):
             queryset = queryset.filter(price__lte=price_lte)
 
         return queryset
+
+def get_index_page(request):
+    with open("templates/parts/index.md", encoding="utf-8") as file:
+        description = file.read()
+
+    return render(
+        request=request,
+        template_name="parts/index.html",
+        context={
+            "title": "Тестовое задание",
+            "menu": menu,
+            "description": description,
+        },
+    )

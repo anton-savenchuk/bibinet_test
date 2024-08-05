@@ -5,8 +5,10 @@ volumes:
   static_data:
   media_data:
 
+
 networks:
   bibinet_net:
+
 
 services:
   django:
@@ -20,10 +22,10 @@ services:
     networks:
       - bibinet_net
     env_file:
-      - ./app/bibinet/env/.env.dev
+      - ./app/env/.env.dev
     volumes:
-      - static_data:/opt/bibinet/static
-      - media_data:/opt/bibinet/media
+      - static_data:/opt/bibinet_django/static
+      - media_data:/opt/bibinet_django/media
     depends_on:
       - postgres
     command: sh -c 'poetry run python manage.py collectstatic --no-input &&
@@ -31,12 +33,27 @@ services:
                     poetry run python manage.py migrate &&
                     poetry run gunicorn core.wsgi:application --bind 0.0.0.0:8000'
 
+  fastapi:
+    build:
+      context: ./app/bibinet_fastapi
+      dockerfile: Dockerfile
+    container_name: bibinet_fastapi
+    restart: always
+    env_file:
+      - ./app/env/.env.dev
+    ports:
+      - '9000:9000'
+    networks:
+      - bibinet_net
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:alpine
     container_name: bibinet_postgres
     restart: always
     env_file:
-      - ./app/bibinet/env/.env.dev
+      - ./app/env/.env.dev
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     networks:
@@ -51,10 +68,11 @@ services:
     networks:
       - bibinet_net
     volumes:
-      - ./app/bibinet/static:/opt/bibinet/static
-      - ./app/bibinet/media:/opt/bibinet/media
+      - ./app/bibinet_django/static:/opt/bibinet_django/static
+      - ./app/bibinet_django/media:/opt/bibinet_django/media
       - ./nginx/dev/:/etc/nginx/conf.d:ro
     links:
       - django
     depends_on:
       - django
+      - fastapi
