@@ -35,7 +35,7 @@
 
 ## POST запрос
 
-Для поиска запчастей в **JSON** формате мажно вольпользоваться скриптом `scripts/request_json.py`
+Для поиска запчастей в **JSON** формате мажно воспользоваться скриптом `scripts/request_json.py`
 
 ```bash
 ~ docker exec -it bibinet_django bash
